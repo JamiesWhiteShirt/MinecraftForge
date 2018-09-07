@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -37,6 +38,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat;
 import net.minecraftforge.client.model.pipeline.VertexBufferConsumer;
 import net.minecraftforge.common.animation.Event;
@@ -98,10 +100,7 @@ public class AnimationModelBase<T extends Entity> extends ModelBase implements I
         {
             lighter.updateBlockInfo();
             empty = false;
-            for(BakedQuad quad : quads)
-            {
-                quad.pipe(lighter);
-            }
+            LightUtil.putBakedQuads(lighter, quads, DefaultVertexFormats.ITEM);
         }
         for(EnumFacing side : EnumFacing.values())
         {
@@ -110,10 +109,7 @@ public class AnimationModelBase<T extends Entity> extends ModelBase implements I
             {
                 if(empty) lighter.updateBlockInfo();
                 empty = false;
-                for(BakedQuad quad : quads)
-                {
-                    quad.pipe(lighter);
-                }
+                LightUtil.putBakedQuads(lighter, quads, DefaultVertexFormats.ITEM);
             }
         }
 

@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/block/model/IBakedModel.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/IBakedModel.java
-@@ -21,7 +21,18 @@
+@@ -21,7 +21,22 @@
  
      TextureAtlasSprite func_177554_e();
  
@@ -18,5 +18,9 @@
 +     */
 +    default org.apache.commons.lang3.tuple.Pair<? extends IBakedModel, javax.vecmath.Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
 +        return net.minecraftforge.client.ForgeHooksClient.handlePerspective(this, cameraTransformType);
++    }
++
++    default net.minecraft.client.renderer.vertex.VertexFormat getFormat() {
++        return net.minecraft.client.renderer.vertex.DefaultVertexFormats.field_176599_b;
 +    }
  }

@@ -19,17 +19,23 @@
 
 package net.minecraftforge.client.model.pipeline;
 
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.color.ItemColors;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.ForgeHooksClient;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -88,33 +94,34 @@ public class LightUtil
 
     private static final ConcurrentMap<Pair<VertexFormat, VertexFormat>, int[]> formatMaps = new ConcurrentHashMap<>();
 
-    public static void putBakedQuad(IVertexConsumer consumer, BakedQuad quad)
+    public static void putBakedQuads(IVertexConsumer consumer, List<BakedQuad> quads, VertexFormat formatTo)
     {
-        consumer.setTexture(quad.getSprite());
-        consumer.setQuadOrientation(quad.getFace());
-        if(quad.hasTintIndex())
-        {
-            consumer.setQuadTint(quad.getTintIndex());
-        }
-        consumer.setApplyDiffuseLighting(quad.shouldApplyDiffuseLighting());
         float[] data = new float[4];
         VertexFormat formatFrom = consumer.getVertexFormat();
-        VertexFormat formatTo = quad.getFormat();
         int countFrom = formatFrom.getElementCount();
         int countTo = formatTo.getElementCount();
         int[] eMap = mapFormats(formatFrom, formatTo);
-        for(int v = 0; v < 4; v++)
-        {
-            for(int e = 0; e < countFrom; e++)
+        for (BakedQuad quad : quads) {
+            consumer.setTexture(quad.getSprite());
+            consumer.setQuadOrientation(quad.getFace());
+            if(quad.hasTintIndex())
             {
-                if(eMap[e] != countTo)
+                consumer.setQuadTint(quad.getTintIndex());
+            }
+            consumer.setApplyDiffuseLighting(quad.shouldApplyDiffuseLighting());
+            for(int v = 0; v < 4; v++)
+            {
+                for(int e = 0; e < countFrom; e++)
                 {
-                    unpack(quad.getVertexData(), data, formatTo, v, eMap[e]);
-                    consumer.put(e, data);
-                }
-                else
-                {
-                    consumer.put(e);
+                    if(eMap[e] != countTo)
+                    {
+                        unpack(quad.getVertexData(), data, formatTo, v, eMap[e]);
+                        consumer.put(e, data);
+                    }
+                    else
+                    {
+                        consumer.put(e);
+                    }
                 }
             }
         }
@@ -266,36 +273,83 @@ public class LightUtil
     }
 
     // renders quad in any Vertex Format, but is slower
-    public static void renderQuadColorSlow(BufferBuilder wr, BakedQuad quad, int auxColor)
+    public static void renderQuadColorSlow(BakedQuad quad, int auxColor, ItemConsumer cons, VertexFormat format)
     {
-        ItemConsumer cons;
-        if(wr == Tessellator.getInstance().getBuffer())
-        {
-            cons = getItemConsumer();
-        }
-        else
-        {
-            cons = new ItemConsumer(new VertexBufferConsumer(wr));
-        }
         float b = (float)(auxColor & 0xFF) / 0xFF;
         float g = (float)((auxColor >>> 8) & 0xFF) / 0xFF;
         float r = (float)((auxColor >>> 16) & 0xFF) / 0xFF;
         float a = (float)((auxColor >>> 24) & 0xFF) / 0xFF;
 
         cons.setAuxColor(r, g, b, a);
-        quad.pipe(cons);
+        putBakedQuads(cons, Collections.singletonList(quad), format);
     }
 
-    public static void renderQuadColor(BufferBuilder wr, BakedQuad quad, int auxColor)
-    {
-        if (quad.getFormat().equals(wr.getVertexFormat())) 
+    public static void renderQuads(BufferBuilder renderer, List<BakedQuad> quads, int color, ItemStack stack, ItemColors itemColors, VertexFormat format) {
+        boolean flag = color == -1 && !stack.isEmpty();
+
+        if (format.equals(renderer.getVertexFormat()))
         {
-            wr.addVertexData(quad.getVertexData());
-            ForgeHooksClient.putQuadColor(wr, quad, auxColor);
+            for (BakedQuad bakedquad : quads) {
+                int k = color;
+
+                if (flag && bakedquad.hasTintIndex())
+                {
+                    k = itemColors.colorMultiplier(stack, bakedquad.getTintIndex());
+
+                    if (EntityRenderer.anaglyphEnable)
+                    {
+                        k = TextureUtil.anaglyphColor(k);
+                    }
+
+                    k = k | -16777216;
+                }
+
+                renderer.addVertexData(bakedquad.getVertexData());
+                ForgeHooksClient.putQuadColor(renderer, bakedquad, k, format);
+            }
         }
         else
         {
-            renderQuadColorSlow(wr, quad, auxColor);
+            ItemConsumer cons;
+            if(renderer == Tessellator.getInstance().getBuffer())
+            {
+                cons = getItemConsumer();
+            }
+            else
+            {
+                cons = new ItemConsumer(new VertexBufferConsumer(renderer));
+            }
+
+            for (BakedQuad bakedquad : quads) {
+                int k = color;
+
+                if (flag && bakedquad.hasTintIndex())
+                {
+                    k = itemColors.colorMultiplier(stack, bakedquad.getTintIndex());
+
+                    if (EntityRenderer.anaglyphEnable)
+                    {
+                        k = TextureUtil.anaglyphColor(k);
+                    }
+
+                    k = k | -16777216;
+                }
+
+                renderQuadColorSlow(bakedquad, k, cons, format);
+            }
+        }
+    }
+
+    public static void renderQuadColor(BufferBuilder wr, BakedQuad quad, int auxColor, VertexFormat format)
+    {
+        if (format.equals(wr.getVertexFormat()))
+        {
+            wr.addVertexData(quad.getVertexData());
+            ForgeHooksClient.putQuadColor(wr, quad, auxColor, format);
+        }
+        else
+        {
+            //renderQuadColorSlow(wr, quad, auxColor);
         }
     }
 

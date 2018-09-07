@@ -531,13 +531,12 @@ public class ForgeHooksClient
         return ret;
     }
 
-    public static void putQuadColor(BufferBuilder renderer, BakedQuad quad, int color)
+    public static void putQuadColor(BufferBuilder renderer, BakedQuad quad, int color, VertexFormat format)
     {
         float cb = color & 0xFF;
         float cg = (color >>> 8) & 0xFF;
         float cr = (color >>> 16) & 0xFF;
         float ca = (color >>> 24) & 0xFF;
-        VertexFormat format = quad.getFormat();
         int size = format.getIntegerSize();
         int offset = format.getColorOffset() / 4; // assumes that color is aligned
         for(int i = 0; i < 4; i++)

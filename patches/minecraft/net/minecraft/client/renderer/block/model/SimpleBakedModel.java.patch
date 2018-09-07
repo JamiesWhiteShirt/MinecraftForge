@@ -1,6 +1,42 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/block/model/SimpleBakedModel.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/SimpleBakedModel.java
-@@ -88,7 +88,7 @@
+@@ -23,18 +23,26 @@
+     protected final TextureAtlasSprite field_177560_e;
+     protected final ItemCameraTransforms field_177558_f;
+     protected final ItemOverrideList field_188620_g;
++    protected final net.minecraft.client.renderer.vertex.VertexFormat vertexFormat;
+ 
+-    public SimpleBakedModel(List<BakedQuad> p_i46535_1_, Map<EnumFacing, List<BakedQuad>> p_i46535_2_, boolean p_i46535_3_, boolean p_i46535_4_, TextureAtlasSprite p_i46535_5_, ItemCameraTransforms p_i46535_6_, ItemOverrideList p_i46535_7_)
+-    {
+-        this.field_177563_a = p_i46535_1_;
+-        this.field_177561_b = p_i46535_2_;
+-        this.field_177562_c = p_i46535_3_;
+-        this.field_177559_d = p_i46535_4_;
+-        this.field_177560_e = p_i46535_5_;
+-        this.field_177558_f = p_i46535_6_;
+-        this.field_188620_g = p_i46535_7_;
++    @Deprecated
++    public SimpleBakedModel(List<BakedQuad> p_i46535_1_, Map<EnumFacing, List<BakedQuad>> p_i46535_2_, boolean p_i46535_3_, boolean p_i46535_4_, TextureAtlasSprite p_i46535_5_, ItemCameraTransforms p_i46535_6_, ItemOverrideList p_i46535_7_) {
++        this(p_i46535_1_, p_i46535_2_, p_i46535_3_, p_i46535_4_, p_i46535_5_, p_i46535_6_, p_i46535_7_, net.minecraft.client.renderer.vertex.DefaultVertexFormats.field_176599_b);
+     }
+ 
++    public SimpleBakedModel(List<BakedQuad> generalQuadsIn, Map<EnumFacing, List<BakedQuad>> faceQuadsIn, boolean ambientOcclusionIn, boolean gui3dIn, TextureAtlasSprite textureIn, ItemCameraTransforms cameraTransformsIn, ItemOverrideList itemOverrideListIn, net.minecraft.client.renderer.vertex.VertexFormat vertexFormat) {
++        this.field_177563_a = generalQuadsIn;
++        this.field_177561_b = faceQuadsIn;
++        this.field_177562_c = ambientOcclusionIn;
++        this.field_177559_d = gui3dIn;
++        this.field_177560_e = textureIn;
++        this.field_177558_f = cameraTransformsIn;
++        this.field_188620_g = itemOverrideListIn;
++        this.vertexFormat = vertexFormat;
++    }
++
++
++
+     public List<BakedQuad> func_188616_a(@Nullable IBlockState p_188616_1_, @Nullable EnumFacing p_188616_2_, long p_188616_3_)
+     {
+         return p_188616_2_ == null ? this.field_177563_a : (List)this.field_177561_b.get(p_188616_2_);
+@@ -88,7 +96,7 @@
  
              public Builder(IBlockState p_i46989_1_, IBakedModel p_i46989_2_, TextureAtlasSprite p_i46989_3_, BlockPos p_i46989_4_)
              {
@@ -9,3 +45,12 @@
                  this.field_177652_d = p_i46989_2_.func_177554_e();
                  long i = MathHelper.func_180186_a(p_i46989_4_);
  
+@@ -158,7 +166,7 @@
+                 }
+                 else
+                 {
+-                    return new SimpleBakedModel(this.field_177656_a, this.field_177654_b, this.field_177655_c, this.field_177653_e, this.field_177652_d, this.field_177651_f, this.field_188646_c);
++                    return new SimpleBakedModel(this.field_177656_a, this.field_177654_b, this.field_177655_c, this.field_177653_e, this.field_177652_d, this.field_177651_f, this.field_188646_c, net.minecraft.client.renderer.vertex.DefaultVertexFormats.field_176599_b);
+                 }
+             }
+         }

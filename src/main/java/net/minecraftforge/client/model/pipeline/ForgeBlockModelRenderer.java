@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -101,10 +102,7 @@ public class ForgeBlockModelRenderer extends BlockModelRenderer
         {
             lighter.updateBlockInfo();
             empty = false;
-            for(BakedQuad quad : quads)
-            {
-                quad.pipe(lighter);
-            }
+            LightUtil.putBakedQuads(lighter, quads, model.getFormat());
         }
         for(EnumFacing side : EnumFacing.values())
         {
@@ -115,10 +113,7 @@ public class ForgeBlockModelRenderer extends BlockModelRenderer
                 {
                     if(empty) lighter.updateBlockInfo();
                     empty = false;
-                    for(BakedQuad quad : quads)
-                    {
-                        quad.pipe(lighter);
-                    }
+                    LightUtil.putBakedQuads(lighter, quads, model.getFormat());
                 }
             }
         }

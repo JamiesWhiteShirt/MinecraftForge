@@ -1,16 +1,27 @@
 --- ../src-base/minecraft/net/minecraft/client/renderer/block/model/BakedQuadRetextured.java
 +++ ../src-work/minecraft/net/minecraft/client/renderer/block/model/BakedQuadRetextured.java
-@@ -12,7 +12,7 @@
+@@ -2,6 +2,8 @@
+ 
+ import java.util.Arrays;
+ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
++import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
++import net.minecraft.client.renderer.vertex.VertexFormat;
+ import net.minecraftforge.fml.relauncher.Side;
+ import net.minecraftforge.fml.relauncher.SideOnly;
+ 
+@@ -12,18 +14,26 @@
  
      public BakedQuadRetextured(BakedQuad p_i46217_1_, TextureAtlasSprite p_i46217_2_)
      {
 -        super(Arrays.copyOf(p_i46217_1_.func_178209_a(), p_i46217_1_.func_178209_a().length), p_i46217_1_.field_178213_b, FaceBakery.func_178410_a(p_i46217_1_.func_178209_a()), p_i46217_1_.func_187508_a());
-+        super(Arrays.copyOf(p_i46217_1_.func_178209_a(), p_i46217_1_.func_178209_a().length), p_i46217_1_.field_178213_b, FaceBakery.func_178410_a(p_i46217_1_.func_178209_a()), p_i46217_1_.func_187508_a(), p_i46217_1_.applyDiffuseLighting, p_i46217_1_.format);
++        super(Arrays.copyOf(p_i46217_1_.func_178209_a(), p_i46217_1_.func_178209_a().length), p_i46217_1_.field_178213_b, FaceBakery.func_178410_a(p_i46217_1_.func_178209_a()), p_i46217_1_.func_187508_a(), p_i46217_1_.applyDiffuseLighting);
          this.field_178218_d = p_i46217_2_;
          this.func_178217_e();
      }
-@@ -21,9 +21,16 @@
+ 
+     private void func_178217_e()
      {
++        VertexFormat format = DefaultVertexFormats.field_176599_b;
          for (int i = 0; i < 4; ++i)
          {
 -            int j = 7 * i;

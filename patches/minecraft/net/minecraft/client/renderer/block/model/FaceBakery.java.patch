@@ -28,7 +28,7 @@
  
 -        return new BakedQuad(aint, p_178414_3_.field_178245_c, enumfacing, p_178414_4_);
 +        net.minecraftforge.client.ForgeHooksClient.fillNormal(aint, enumfacing);
-+        return new BakedQuad(aint, p_178414_3_.field_178245_c, enumfacing, p_178414_4_, p_178414_9_, net.minecraft.client.renderer.vertex.DefaultVertexFormats.field_176599_b);
++        return new BakedQuad(aint, p_178414_3_.field_178245_c, enumfacing, p_178414_4_, p_178414_9_);
      }
  
      private BlockFaceUV func_188010_a(BlockFaceUV p_188010_1_, EnumFacing p_188010_2_, ModelRotation p_188010_3_)

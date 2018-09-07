@@ -57,7 +57,7 @@ public class UnpackedBakedQuad extends BakedQuad
         return vertexData;
     }
 
-    @Override
+    /* @Override
     public void pipe(IVertexConsumer consumer)
     {
         int[] eMap = LightUtil.mapFormats(consumer.getVertexFormat(), format);
@@ -83,7 +83,7 @@ public class UnpackedBakedQuad extends BakedQuad
                 }
             }
         }
-    }
+    } */
 
     public static class Builder implements IVertexConsumer
     {
